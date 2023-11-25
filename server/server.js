@@ -1,12 +1,12 @@
 const express = require('express');
 const path = require('path');
-const db = require('../solid-broccoli/Develop/server/config/connection');
-const routes = require('../solid-broccoli/Develop/server/routes');
+const db = require('../server/config/connection');
+const routes = require('../server/routes');
 const { ApolloServer} = require('@apollo/server');
 const { expressMiddleware } = require('@apollo/server/express4');
 const { authMiddleware } = require('./utils/auth');
 
-const { typeDefs, resolvers } = require('../solid-broccoli/Develop/server/schemas')
+const { typeDefs, resolvers } = require('../server/schemas')
 
 const app = express();
 const PORT = process.env.PORT || 3005;

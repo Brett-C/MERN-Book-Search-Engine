@@ -1,4 +1,4 @@
-const typeDefs = `
+const typeDefs =`
 type Query {
     me: User
 }
@@ -9,7 +9,7 @@ type Auth {
 }
 
 type Book {
-    bookId: ID
+    bookId: String
     authors: [String]
     description: String
     title: String
@@ -34,7 +34,7 @@ type Mutation {
 }
 
 input BookInput {
-    bookId: ID
+    bookId: String
     authors: [String]
     description: String
     title: String
@@ -42,3 +42,5 @@ input BookInput {
     link: String
 }
 `;
+
+module.exports = typeDefs;
