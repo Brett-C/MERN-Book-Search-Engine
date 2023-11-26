@@ -9,42 +9,53 @@ import {
 
 import { useQuery, useMutation } from '@apollo/client';
 import { REMOVE_BOOK } from '../utils/mutations';
-import { GET_ME } from '../utils/queries';
+import { GET_ME } from '../utils/queries.js';
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
+import { gql } from 'graphql-tag'
 
 
 
 const SavedBooks = () => {
   const [userData, setUserData] = useState({});
+  const [removeBook] = useMutation(REMOVE_BOOK);
+  const token = Auth.loggedIn() ? Auth.getToken(): null;
 
   // use this to determine if `useEffect()` hook needs to run again
   const userDataLength = Object.keys(userData).length;
 
-  useEffect(() => {
-    const getUserData = async () => {
-      try {
-        const token = Auth.loggedIn() ? Auth.getToken() : null;
-
-        if (!token) {
-          return false;
-        }
-
-        const response = await getMe(token);
-
-        if (!response.ok) {
-          throw new Error('something went wrong!');
-        }
-
-        const user = await response.json();
-        setUserData(user);
-      } catch (err) {
-        console.error(err);
+  const { data, error } = useQuery(gql`
+         query me {
+          me {
+              _id
+              username
+              email
+              bookCount
+              savedBooks {
+                  bookId
+                  authors
+                  description
+                  title
+                  image
+                  link
+              }
+          }
       }
-    };
+         `);
 
-    getUserData();
-  }, [userDataLength]);
+         useEffect(() => {
+          console.log('Data:', data);
+          if (data) {
+            if (error) {
+              console.error(error);
+            } else {
+              const newUser = data.me || {};
+              setUserData(newUser);
+            }
+          }
+        }, [data, error, token]);
+    
+    
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
@@ -55,10 +66,13 @@ const SavedBooks = () => {
     }
 
     try {
-      const response = await deleteBook(bookId, token);
+      const response = await removeBook({
+        variables: { bookId },
+        refetchQueries: [{ query: GET_ME }],
+      })
 
-      if (!response.ok) {
-        throw new Error('something went wrong!');
+      if (!response.errors) {
+        throw new Error(response.errors[0].message);
       }
 
       const updatedUser = await response.json();
@@ -66,7 +80,7 @@ const SavedBooks = () => {
       // upon success, remove book's id from localStorage
       removeBookId(bookId);
     } catch (err) {
-      console.error(err);
+      console.error(err.message);
     }
   };
 

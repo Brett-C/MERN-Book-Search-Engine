@@ -14,11 +14,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "concurrently": "^5.1.0"
+    "concurrently": "^5.1.0",
+    "vite-plugin-graphql": "^0.1.0"
   },
   "dependencies": {
     "@apollo/client": "^3.8.7",
     "@apollo/server": "^4.9.5",
-    "graphql": "^16.8.1"
+    "graphql": "^16.8.1",
+    "graphql-tag": "^2.12.6"
   }
 }
